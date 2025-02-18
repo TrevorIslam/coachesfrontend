@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useCart } from '../hooks/useCart';
 import { useProfile } from '../hooks/useProfile';
 
 const Header = () => {
     const { user, logout } = useAuth();
     const { profile } = useProfile();
-    const { cartItems } = useCart();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const headerRef = useRef(null);
     const location = useLocation();
@@ -60,16 +58,15 @@ const Header = () => {
             <nav className="nav-container">
                 {/* Logo */}
                 <Link to="/" className="logo">
-                    Elite Soccer Blueprint
+                    Coach Portal
                 </Link>
 
                 {/* Nav Links */}
                 <div className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-                    <Link to="/services" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Services</Link>
-                    <Link to="/training-plans" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Training Plans</Link>
-                    <Link to="/coaches" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Coaches</Link>
-                    <Link to="/about" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
-                    <Link to="/contact" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+                    <Link to="/profile" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Profile</Link>
+                    <Link to="/availability" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Availability</Link>
+                    <Link to="/sessions" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Sessions</Link>
+                    <Link to="/clients" className="nav-item" onClick={() => setIsMobileMenuOpen(false)}>Clients</Link>
                 </div>
 
                 {/* Right Nav Section */}
@@ -101,6 +98,10 @@ const Header = () => {
                                         <i className="fas fa-user" />
                                         Profile
                                     </Link>
+                                    <Link to="/settings" className="dropdown-item">
+                                        <i className="fas fa-cog" />
+                                        Settings
+                                    </Link>
                                     <button 
                                         onClick={logout}
                                         className="dropdown-item"
@@ -120,16 +121,6 @@ const Header = () => {
                             </Link>
                         )}
                     </div>
-
-                    {/* Cart Icon */}
-                    <Link to="/cart" className="cart-icon relative hover:text-primary transition-colors">
-                        <i className="fas fa-shopping-cart text-primary" />
-                        {cartItems.length > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {cartItems.length}
-                            </span>
-                        )}
-                    </Link>
 
                     {/* Mobile Menu Button */}
                     <button

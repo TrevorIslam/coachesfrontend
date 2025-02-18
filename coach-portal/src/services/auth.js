@@ -26,28 +26,23 @@ export const authService = {
         // Parse JSON only for successful responses
         const data = await response.json();
 
-        // Store auth data in localStorage
+        // Store auth data in localStorage with updated coach data structure
         localStorage.setItem('auth', JSON.stringify({
             token: data.access_token,
             expiresAt: data.expires_at,
             refreshToken: data.refresh_token,
             user: {
-                id: data.user.id,
-                email: data.user.email,
-                firstName: data.user.first_name,
-                lastName: data.user.last_name
+                id: data.coach.id,
+                authId: data.coach.auth_id,
+                email: data.coach.email,
+                status: data.coach.status
             }
         }));
 
-        return data.user;
+        return data.coach;
     },
 
     signup: async (userData) => {
-        // Validation
-        if (!userData.firstName?.trim() || !userData.lastName?.trim()) {
-            throw new Error('First and last name are required');
-        }
-
         if (!isValidEmail(userData.email)) {
             throw new Error('Please enter a valid email address');
         }
@@ -61,16 +56,22 @@ export const authService = {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(userData),
+            body: JSON.stringify({
+                email: userData.email,
+                password: userData.password,
+                // Note: firstName and lastName will be handled in a separate profile update
+                // after account approval
+            }),
         });
 
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.message || 'Error creating account');
+            throw new Error(data.message || data.error || 'Error creating account');
         }
 
-        return data;
+        // Return the user data from the response
+        return data.user;
     },
 
     logout: () => {

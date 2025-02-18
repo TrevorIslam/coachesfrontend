@@ -7,18 +7,16 @@ const SignUpPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
         email: '',
         password: '',
         confirmPassword: ''
     });
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: value
         }));
         setError('');
     };
@@ -40,15 +38,22 @@ const SignUpPage = () => {
             return;
         }
 
-        await signUp(formData.firstName, formData.lastName, formData.email, formData.password);
+        await signUp(formData.email, formData.password);
     };
 
     return (
         <div className="bg-gray-50 min-h-screen py-16 px-4">
             <div className="bg-white rounded-lg shadow-md p-8 max-w-md mx-auto">
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold mb-2">Create Your Account</h1>
-                    <p className="text-gray-600">Join Elite Soccer Blueprint and start your journey</p>
+                    <h1 className="text-2xl font-bold mb-2">Create Your Coach Account</h1>
+                    <p className="text-gray-600">Join Elite Soccer Blueprint as a coach</p>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+                    <p className="text-sm text-blue-800">
+                        <i className="fas fa-info-circle mr-2"></i>
+                        After signing up, your account will need to be approved before you can access the coaching platform.
+                    </p>
                 </div>
 
                 {error && (
@@ -59,31 +64,6 @@ const SignUpPage = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="input-group">
-                        <label htmlFor="firstName" className="input-label">First Name</label>
-                        <input
-                            type="text"
-                            id="firstName"
-                            name="firstName"
-                            className="form-input"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label htmlFor="lastName" className="input-label">Last Name</label>
-                        <input
-                            type="text"
-                            id="lastName"
-                            name="lastName"
-                            className="form-input"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-
                     <div className="input-group">
                         <label htmlFor="email" className="input-label">Email</label>
                         <input
@@ -168,37 +148,6 @@ const SignUpPage = () => {
                         </p>
                     </div>
                 </form>
-
-                {/* Social Sign Up */}
-                <div className="mt-8">
-                    <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">
-                                Or sign up with
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="mt-6 grid grid-cols-2 gap-4">
-                        <button 
-                            className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            onClick={() => console.log('Google signup')}
-                        >
-                            <i className="fab fa-google mr-2"></i>
-                            Google
-                        </button>
-                        <button 
-                            className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            onClick={() => console.log('Apple signup')}
-                        >
-                            <i className="fab fa-apple mr-2"></i>
-                            Apple
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     );

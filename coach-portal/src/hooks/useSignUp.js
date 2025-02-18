@@ -18,16 +18,11 @@ export const useSignUp = () => {
         return passwordRegex.test(password);
     };
 
-    const signUp = async (firstName, lastName, email, password) => {
+    const signUp = async (email, password) => {
         setIsLoading(true);
         setError('');
 
         try {
-            // Validation
-            if (!firstName?.trim() || !lastName?.trim()) {
-                throw new Error('First and last name are required');
-            }
-
             if (!isValidEmail(email)) {
                 throw new Error('Please enter a valid email address');
             }
@@ -36,18 +31,12 @@ export const useSignUp = () => {
                 throw new Error('Password must be at least 8 characters long and include a number and a special character');
             }
 
-            await authService.signup({ firstName, lastName, email, password });
+            await authService.signup({ email, password });
             
-            // Get the return path from sessionStorage
-            const returnTo = sessionStorage.getItem('returnTo');
-            const returnPath = returnTo ? JSON.parse(returnTo) : { pathname: '/login' };
-            sessionStorage.removeItem('returnTo');
-            
-            // Navigate to login with success message and preserve the return path
+            // Navigate to login with pending approval message
             navigate('/login', { 
                 state: { 
-                    message: 'Account created successfully! Please log in.',
-                    from: returnPath
+                    message: 'Account created successfully! Please wait for admin approval before logging in.',
                 }
             });
             return true;

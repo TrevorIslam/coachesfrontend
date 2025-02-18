@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { usePlayers } from '../hooks/usePlayers';
+import { Navigate } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Profile = () => {
     const { isAuthenticated } = useAuth();
-    const { players, loading: playersLoading, refreshPlayers, deletePlayer } = usePlayers();
     const { profile, loading: profileLoading, error } = useProfile();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [showManageMenu, setShowManageMenu] = useState(false);
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedPlayer, setSelectedPlayer] = useState(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     if (!isAuthenticated) {
         return <Navigate to="/login" />;
@@ -22,42 +17,9 @@ const Profile = () => {
         return <LoadingSpinner />;
     }
 
-    const handleCreatePlayer = async (newPlayer) => {
-        setIsModalOpen(false);
-        await refreshPlayers();
-    };
-
-    const calculateAge = (dateOfBirth) => {
-        const birthDate = new Date(dateOfBirth);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
-    };
-
-    const handleDeletePlayer = async (player) => {
-        if (window.confirm(`Are you sure you want to delete ${player.first_name} ${player.last_name}?`)) {
-            try {
-                await deletePlayer(player.id);
-            } catch (error) {
-                console.error('Error deleting player:', error);
-                alert('Failed to delete player. Please try again.');
-            }
-        }
-    };
-
-    const handleEditClick = (player) => {
-        setSelectedPlayer(player);
-        setEditModalOpen(true);
-    };
-
     return (
         <div className="max-w-4xl mx-auto p-6">
-            {/* User Info Section */}
+            {/* Coach Info Section */}
             <div className="bg-white p-6 rounded-lg shadow mb-8">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
@@ -71,117 +33,93 @@ const Profile = () => {
                             <i className="fas fa-user text-gray-400 text-3xl" />
                         )}
                     </div>
-                    <div>
-                        {profileLoading ? (
-                            <div className="animate-pulse">
-                                <div className="h-6 w-48 bg-gray-200 rounded mb-2"></div>
-                                <div className="h-4 w-32 bg-gray-200 rounded"></div>
-                            </div>
-                        ) : (
-                            <>
+                    <div className="flex-grow">
+                        <div className="flex justify-between items-start">
+                            <div>
                                 <h1 className="text-2xl font-bold">
                                     {profile?.first_name ? `${profile.first_name} ${profile.last_name}` : profile?.email}
                                 </h1>
                                 <p className="text-gray-600">{profile?.email}</p>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Players Section */}
-            <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold">My Players</h2>
-                    <button 
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
-                    >
-                        <i className="fas fa-plus mr-2"></i>
-                        Add New Player
-                    </button>
-                </div>
-
-                {playersLoading ? (
-                    <div className="text-center py-8">
-                        <i className="fas fa-spinner fa-spin text-primary text-2xl"></i>
-                        <p className="text-gray-600 mt-2">Loading players...</p>
-                    </div>
-                ) : players.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {players.map((player) => (
-                            <div 
-                                key={player.id} 
-                                className="border rounded-lg p-4 hover:shadow-md transition-shadow relative group"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <i className="fas fa-user text-gray-400" />
-                                    </div>
-                                    <div className="flex-grow">
-                                        <h3 className="font-semibold">
-                                            {player.first_name} {player.last_name}
-                                        </h3>
-                                        <p className="text-sm text-gray-600">
-                                            {player.primary_position} • Age: {calculateAge(player.date_of_birth)}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {player.current_team} - {player.team_level}
-                                        </p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleEditClick(player)}
-                                            className="text-gray-400 hover:text-blue-500 transition-colors p-1"
-                                            title="Edit Player"
-                                        >
-                                            <i className="fas fa-edit"></i>
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeletePlayer(player)}
-                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                                            title="Delete Player"
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                                <p className="text-gray-600">{profile?.phone_number}</p>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-8">
-                        <div className="text-gray-400 mb-3">
-                            <i className="fas fa-users text-4xl"></i>
+                            <button 
+                                onClick={() => setIsEditModalOpen(true)}
+                                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+                            >
+                                <i className="fas fa-edit mr-2"></i>
+                                Edit Profile
+                            </button>
                         </div>
-                        <p className="text-gray-600 mb-4">You haven't added any players yet</p>
-                        <button 
-                            onClick={() => setIsModalOpen(true)}
-                            className="text-primary hover:text-primary-dark transition-colors"
-                        >
-                            Add your first player
-                        </button>
                     </div>
-                )}
+                </div>
+
+                {/* Coaching Details */}
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-semibold">Coaching Information</h2>
+                        <div>
+                            <p className="text-gray-600 mb-1">Specializations</p>
+                            <div className="flex flex-wrap gap-2">
+                                {profile?.specializations?.map((spec, index) => (
+                                    <span key={index} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                                        {spec}
+                                    </span>
+                                )) || 'Not specified'}
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 mb-1">Experience Level</p>
+                            <p>{profile?.experience_level || 'Not specified'}</p>
+                        </div>
+                        <div>
+                            <p className="text-gray-600 mb-1">Certifications</p>
+                            <ul className="list-disc list-inside">
+                                {profile?.certifications?.map((cert, index) => (
+                                    <li key={index}>{cert}</li>
+                                )) || <li>No certifications listed</li>}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-semibold">Stats & Metrics</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-gray-600 text-sm">Total Sessions</p>
+                                <p className="text-2xl font-bold text-primary">
+                                    {profile?.total_sessions || 0}
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-gray-600 text-sm">Active Clients</p>
+                                <p className="text-2xl font-bold text-primary">
+                                    {profile?.active_clients || 0}
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-gray-600 text-sm">Rating</p>
+                                <p className="text-2xl font-bold text-primary">
+                                    {profile?.rating || '0.0'} <span className="text-sm">/ 5.0</span>
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="text-gray-600 text-sm">Reviews</p>
+                                <p className="text-2xl font-bold text-primary">
+                                    {profile?.review_count || 0}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bio Section */}
+                <div className="mt-8">
+                    <h2 className="text-xl font-semibold mb-4">About Me</h2>
+                    <p className="text-gray-700 whitespace-pre-line">
+                        {profile?.bio || 'No bio provided yet.'}
+                    </p>
+                </div>
             </div>
-
-            <CreatePlayerModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleCreatePlayer}
-            />
-
-            {selectedPlayer && (
-                <EditPlayerModal 
-                    isOpen={editModalOpen}
-                    onClose={() => {
-                        setEditModalOpen(false);
-                        setSelectedPlayer(null);
-                        refreshPlayers();
-                    }}
-                    player={selectedPlayer}
-                />
-            )}
         </div>
     );
 };

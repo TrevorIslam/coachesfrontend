@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth';
-import { useCart } from './useCart';
 
 export const useLogin = () => {
     const navigate = useNavigate();
     const { setUser } = useAuth();
-    const { mergeGuestCart } = useCart();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -36,20 +34,17 @@ export const useLogin = () => {
                 throw new Error('Login failed');
             }
             
-            setUser(userData);
-            
-            try {
-                await mergeGuestCart(userData);
-            } catch (error) {
-                console.error('Error merging cart:', error);
+            // Check coach status
+            if (userData.status === 'pending') {
+                throw new Error('Your account is pending approval. Please check back later.');
+            }
+
+            if (userData.status === 'suspended') {
+                throw new Error('Your account has been suspended. Please contact support.');
             }
             
-            // Get the return path from sessionStorage
-            const returnTo = sessionStorage.getItem('returnTo');
-            const returnPath = returnTo ? JSON.parse(returnTo) : { pathname: '/' };
-            sessionStorage.removeItem('returnTo'); // Clear the stored path
-            
-            navigate(returnPath.pathname + (returnPath.search || ''));
+            setUser(userData);
+            navigate('/dashboard');
             return true;
         } catch (error) {
             console.error('Login error:', error);
