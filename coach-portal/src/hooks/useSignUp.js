@@ -33,10 +33,10 @@ export const useSignUp = () => {
 
             await authService.signup({ email, password });
             
-            // Navigate to login with pending approval message
-            navigate('/login', { 
+            // Navigate to pending approval page
+            navigate('/pending-approval', { 
                 state: { 
-                    message: 'Account created successfully! Please wait for admin approval before logging in.',
+                    message: 'Account created successfully! Please complete your profile for review.',
                 }
             });
             return true;

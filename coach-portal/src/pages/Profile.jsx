@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useProfile } from '../hooks/useProfile';
+import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Profile = () => {
     const { isAuthenticated } = useAuth();
-    const { profile, loading: profileLoading, error } = useProfile();
+    const { profile, loading: profileLoading, error } = useCoachProfile();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     if (!isAuthenticated) {

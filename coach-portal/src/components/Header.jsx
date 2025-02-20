@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useProfile } from '../hooks/useProfile';
+import { useCoachProfile } from '../hooks/useCoachProfile';
 
 const Header = () => {
     const { user, logout } = useAuth();
-    const { profile } = useProfile();
+    const { profile } = useCoachProfile();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const headerRef = useRef(null);
     const location = useLocation();

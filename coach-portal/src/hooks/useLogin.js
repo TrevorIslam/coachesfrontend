@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth';
 
 export const useLogin = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { setUser } = useAuth();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -33,18 +34,19 @@ export const useLogin = () => {
             if (!userData) {
                 throw new Error('Login failed');
             }
-            
-            // Check coach status
-            if (userData.status === 'pending') {
-                throw new Error('Your account is pending approval. Please check back later.');
-            }
 
-            if (userData.status === 'suspended') {
-                throw new Error('Your account has been suspended. Please contact support.');
-            }
-            
             setUser(userData);
-            navigate('/dashboard');
+
+            // Handle different account statuses
+            if (userData.status === 'pending') {
+                navigate('/pending-approval');
+            } else if (userData.status === 'suspended') {
+                throw new Error('Your account has been suspended. Please contact support.');
+            } else {
+                // If there's a saved return path, use it, otherwise go to dashboard
+                const returnTo = location.state?.from || { pathname: '/dashboard' };
+                navigate(returnTo);
+            }
             return true;
         } catch (error) {
             console.error('Login error:', error);

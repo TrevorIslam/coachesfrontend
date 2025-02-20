@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
         user: user ? {
             id: user.id,
             email: user.email,
-            // Only keep fields needed for authentication
+            status: user.status,
         } : null,
         isAuthenticated: !!user,
         setUser,

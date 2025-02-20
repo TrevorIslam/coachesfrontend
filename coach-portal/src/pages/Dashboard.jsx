@@ -1,9 +1,9 @@
 import React from 'react';
-import { useProfile } from '../hooks/useProfile';
+import { useCoachProfile } from '../hooks/useCoachProfile';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
-  const { profile, loading } = useProfile();
+  const { profile, loading } = useCoachProfile();
 
   if (loading) return <LoadingSpinner />;
 
